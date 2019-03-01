@@ -1,24 +1,26 @@
 import ElementVisibilityWatcher from './visibility.observer'
 
-let visibilityObserver = new ElementVisibilityWatcher()
+if (window.Ractive) {
+  window.Ractive.createViewportEvent = typeof window.IntersectionObserver !== 'undefined'
+    ? (opts) => {
+      let visibilityObserver = new ElementVisibilityWatcher(opts)
 
-const viewport = (node, fire) => {
-  visibilityObserver.watch(node, (visible, data) => {
-    fire({
-      node: node,
-      original: {
-        visible: visible,
-        intersectionData: data
+      return (node, fire) => {
+        visibilityObserver.watch(node, (visible, data) => {
+          fire({
+            node: node,
+            original: {
+              visible: visible,
+              intersectionData: data
+            }
+          })
+        })
+        return {
+          teardown: () => {
+            visibilityObserver.unwatch(node)
+          }
+        }
       }
-    })
-  })
-  return {
-    teardown: () => {
-      visibilityObserver.unwatch(node)
     }
-  }
-}
-
-if (window.Ractive && window.Ractive.events && !window.Ractive.events.viewport) {
-  window.Ractive.events.viewport = viewport
+    : (opts) => (node, fire) => ({ teardown: () => {} })
 }

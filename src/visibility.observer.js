@@ -1,5 +1,3 @@
-import 'intersection-observer'
-
 class ElementVisibilityWatcher {
   constructor (observerOptions = {}) {
     this.observerOptions = Object.assign({
